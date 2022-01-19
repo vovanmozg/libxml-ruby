@@ -168,6 +168,15 @@ class TestXPath < Minitest::Test
     end
   end
 
+  def test_path_memory
+    node = LibXML::XML::Node.new('node')
+    p `ps -o rss= -p #{Process.pid}`.to_f
+    1000000.times do
+      node.path
+    end
+    p `ps -o rss= -p #{Process.pid}`.to_f
+  end
+
   # Test that document doesn't get freed before nodes
   def test_xpath_free
     doc = LibXML::XML::Document.file(File.join(File.dirname(__FILE__), 'model/soap.xml'))
