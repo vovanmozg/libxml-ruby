@@ -71,7 +71,28 @@ class TestNodeEdit < Minitest::Test
     doc = xp.parse
     doc.root.child.remove!
     GC.start
-    refute_nil(doc)
+  end
+
+  def test_remove_leak
+    doc = LibXML::XML::Document.new('1.0')
+    10.times do
+      before = `ps -o rss= -p #{Process.pid}`.chop
+      GC.start
+      100000.times do
+        doc = LibXML::XML::Document.new('1.0')
+        node = LibXML::XML::Node.new('node')
+        doc.root = node
+        doc.root.remove!
+        doc = nil
+        node = nil
+
+
+        #doc.root.remove!
+
+      end
+      GC.start
+      puts before + ' / ' + `ps -o rss= -p #{Process.pid}`
+    end
   end
 
   def test_remove_node_iteration
